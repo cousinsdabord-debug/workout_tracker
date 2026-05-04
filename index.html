@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Training">
+<title>Training</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0a0a0a;
+  --surface:#111;
+  --surface2:#1a1a1a;
+  --border:#222;
+  --text:#f5f0e8;
+  --muted:#555;
+  --muted2:#333;
+  --push:#ff6b35;
+  --pull:#4a9eff;
+  --legs:#4ade80;
+  --upper:#f59e0b;
+  --accent:#ff6b35;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;overflow-x:hidden}
+
+/* HEADER */
+.header{padding:20px 20px 0;display:flex;align-items:flex-end;justify-content:space-between}
+.header-title{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;line-height:1;color:var(--text)}
+.header-title span{color:var(--accent)}
+.header-date{font-size:12px;color:var(--muted);text-align:right;line-height:1.5}
+
+/* NAV TABS */
+.nav{display:flex;gap:4px;padding:16px 20px 0}
+.nav-btn{flex:1;padding:10px 6px;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;transition:all .2s;background:var(--surface);color:var(--muted)}
+.nav-btn.active{background:var(--accent);color:#fff}
+
+/* WEEK STRIP */
+.week-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:16px 20px 0}
+.wday{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
+.wday-lbl{font-size:9px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)}
+.wday-dot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--muted);background:var(--surface);border:1.5px solid transparent;transition:all .2s}
+.wday-dot.today{border-color:var(--accent);color:var(--accent)}
+.wday-dot.has-session{background:var(--surface2);color:var(--text)}
+.wday-dot.push-day{border-color:var(--push) !important}
+.wday-dot.pull-day{border-color:var(--pull) !important}
+.wday-dot.legs-day{border-color:var(--legs) !important}
+.wday-dot.upper-day{border-color:var(--upper) !important}
+
+/* SESSION CARD */
+.session-header{margin:20px 20px 0;padding:16px 20px;border-radius:16px;position:relative;overflow:hidden}
+.session-header.push{background:linear-gradient(135deg,#1a0e08,#2a1208);border:1px solid #ff6b3530}
+.session-header.pull{background:linear-gradient(135deg,#080f1a,#0a1828);border:1px solid #4a9eff30}
+.session-header.legs{background:linear-gradient(135deg,#081a0e,#0c2814);border:1px solid #4ade8030}
+.session-header.upper{background:linear-gradient(135deg,#1a1208,#261a08);border:1px solid #f59e0b30}
+.session-header.rest{background:var(--surface);border:1px solid var(--border)}
+.session-type{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px}
+.session-type.push{color:var(--push)}
+.session-type.pull{color:var(--pull)}
+.session-type.legs{color:var(--legs)}
+.session-type.upper{color:var(--upper)}
+.session-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.session-series{font-family:'Bebas Neue',sans-serif;font-size:48px;position:absolute;right:20px;top:12px;opacity:0.08;letter-spacing:-2px}
+
+/* EXERCISES */
+.exercises{display:flex;flex-direction:column;gap:8px;padding:12px 20px 0}
+.ex-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:all .2s}
+.ex-card:active{transform:scale(0.98)}
+.ex-card.logged{border-color:#2a3a2a}
+.ex-main{display:flex;align-items:center;gap:12px;padding:14px 16px}
+.ex-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.ex-icon.push{background:#ff6b3515}
+.ex-icon.pull{background:#4a9eff15}
+.ex-icon.legs{background:#4ade8015}
+.ex-icon.upper{background:#f59e0b15}
+.ex-info{flex:1;min-width:0}
+.ex-name{font-size:14px;font-weight:600;color:var(--text)}
+.ex-sets{font-size:11px;color:var(--muted);margin-top:2px}
+.ex-last{text-align:right;flex-shrink:0}
+.ex-last-val{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px}
+.ex-last-val.push{color:var(--push)}
+.ex-last-val.pull{color:var(--pull)}
+.ex-last-val.legs{color:var(--legs)}
+.ex-last-val.upper{color:var(--upper)}
+.ex-last-val.none{color:var(--muted);font-size:16px}
+.ex-last-lbl{font-size:9px;color:var(--muted);text-align:right}
+.ex-logged-bar{height:3px;background:linear-gradient(90deg,#1a3a1a,#4ade80)}
+
+/* LOG PANEL */
+.log-panel{display:none;padding:0 16px 16px;border-top:1px solid var(--border)}
+.log-panel.open{display:block}
+.log-row{display:flex;gap:8px;align-items:center;margin-top:12px}
+.log-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;color:var(--text);text-align:center;-webkit-appearance:none}
+.log-input:focus{outline:none;border-color:var(--accent)}
+.log-input::placeholder{color:var(--muted);font-weight:400}
+.log-unit{font-size:12px;color:var(--muted);flex-shrink:0}
+.log-save{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0}
+.log-save:active{opacity:0.8}
+.log-history{margin-top:10px;display:flex;flex-direction:column;gap:4px}
+.log-hist-row{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--surface2);border-radius:8px}
+.log-hist-date{font-size:11px;color:var(--muted)}
+.log-hist-val{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px}
+.log-hist-note{font-size:10px;color:var(--muted);font-style:italic}
+
+/* PERF PAGE */
+.perf-page{display:none;padding:0 20px}
+.perf-page.active{display:block}
+.perf-filter{display:flex;gap:6px;padding:16px 0 0;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none}
+.perf-filter::-webkit-scrollbar{display:none}
+.filter-btn{flex-shrink:0;padding:7px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;white-space:nowrap}
+.filter-btn.push.active{background:var(--push);border-color:var(--push);color:#fff}
+.filter-btn.pull.active{background:var(--pull);border-color:var(--pull);color:#fff}
+.filter-btn.legs.active{background:var(--legs);border-color:var(--legs);color:#000}
+.filter-btn.upper.active{background:var(--upper);border-color:var(--upper);color:#fff}
+.filter-btn.all.active{background:var(--text);border-color:var(--text);color:#000}
+
+.perf-list{display:flex;flex-direction:column;gap:12px;padding-top:12px}
+.perf-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.perf-card-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 10px}
+.perf-card-name{font-size:14px;font-weight:600}
+.perf-card-max{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px}
+.perf-card-max.push{color:var(--push)}
+.perf-card-max.pull{color:var(--pull)}
+.perf-card-max.legs{color:var(--legs)}
+.perf-card-max.upper{color:var(--upper)}
+.chart-wrap{padding:0 16px 14px;position:relative;height:70px}
+canvas{width:100%;height:70px}
+.perf-table{border-top:1px solid var(--border)}
+.perf-table-row{display:flex;justify-content:space-between;padding:8px 16px;border-bottom:1px solid var(--muted2);font-size:12px}
+.perf-table-row:last-child{border-bottom:none}
+.perf-table-row .date{color:var(--muted)}
+.perf-table-row .val{font-weight:600}
+.perf-table-row .note{color:var(--muted);font-style:italic;font-size:11px}
+.perf-empty{padding:16px;font-size:12px;color:var(--muted);text-align:center}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,10,0.95);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;padding:8px 20px 20px;gap:6px;z-index:50}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border:none;background:none;cursor:pointer;border-radius:10px;transition:all .2s}
+.bnav-btn.active{background:var(--surface)}
+.bnav-icon{font-size:20px;line-height:1}
+.bnav-lbl{font-size:10px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--muted)}
+.bnav-btn.active .bnav-lbl{color:var(--text)}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:flex-end;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border-radius:24px 24px 0 0;padding:24px 24px 40px;width:100%;max-height:80vh;overflow-y:auto}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--muted);margin-bottom:20px}
+.modal-field{margin-bottom:16px}
+.modal-label{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.modal-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-family:'DM Sans',sans-serif;font-size:18px;font-weight:600;color:var(--text);text-align:center;-webkit-appearance:none}
+.modal-input:focus{outline:none;border-color:var(--accent)}
+.modal-note{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);resize:none}
+.modal-note:focus{outline:none;border-color:var(--accent)}
+.modal-save{width:100%;background:var(--accent);color:#fff;border:none;border-radius:14px;padding:16px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;cursor:pointer;margin-top:8px}
+.modal-save:active{opacity:0.8}
+.modal-cancel{width:100%;background:none;color:var(--muted);border:none;padding:12px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;margin-top:4px}
+.modal-prev{background:var(--surface2);border-radius:12px;padding:12px 14px;margin-bottom:16px}
+.modal-prev-title{font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.modal-prev-list{display:flex;flex-direction:column;gap:5px;max-height:120px;overflow-y:auto}
+.modal-prev-row{display:flex;justify-content:space-between;font-size:12px}
+.modal-prev-date{color:var(--muted)}
+.modal-prev-val{font-weight:600}
+
+/* UTILS */
+.page{display:none}.page.active{display:block}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--muted);padding:16px 20px 0}
+.empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-title">TRAIN<span>ING</span></div>
+  <div class="header-date" id="header-date"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="bnav-btn active" onclick="showPage('today')" id="bnav-today">
+    <div class="bnav-icon">🏋️</div>
+    <div class="bnav-lbl">Séance</div>
+  </button>
+  <button class="bnav-btn" onclick="showPage('perf')" id="bnav-perf">
+    <div class="bnav-icon">📊</div>
+    <div class="bnav-lbl">Perfs</div>
+  </button>
+</div>
+
+<!-- PAGE TODAY -->
+<div class="page active" id="page-today">
+  <div class="week-strip" id="week-strip"></div>
+  <div id="session-content"></div>
+</div>
+
+<!-- PAGE PERF -->
+<div class="page" id="page-perf">
+  <div class="perf-page active" id="perf-content">
+    <div class="perf-filter" id="perf-filter"></div>
+    <div class="perf-list" id="perf-list"></div>
+  </div>
+</div>
+
+<!-- MODAL LOG -->
+<div class="modal-bg" id="modal-bg" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">DÉVELOPPÉ COUCHÉ</div>
+    <div class="modal-sub" id="modal-sub">4 × 6–8 reps</div>
+    <div class="modal-prev" id="modal-prev" style="display:none">
+      <div class="modal-prev-title">Historique</div>
+      <div class="modal-prev-list" id="modal-prev-list"></div>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Poids (kg)</div>
+      <input class="modal-input" type="number" id="modal-weight" placeholder="0" inputmode="decimal" step="0.5">
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Note (optionnel)</div>
+      <textarea class="modal-note" id="modal-note" rows="2" placeholder="machine occupée, fatigue..."></textarea>
+    </div>
+    <button class="modal-save" onclick="saveLog()">ENREGISTRER</button>
+    <button class="modal-cancel" onclick="closeModalDirect()">Annuler</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const PROGRAM = [
+  {
+    id:'push', name:'PUSH', sub:'Pectoraux · Épaules · Triceps', color:'push', series:17,
+    exercises:[
+      {id:'dc',        name:'Développé couché convergente', sets:'4×6–8',   icon:'🏋️'},
+      {id:'dc_incline',name:'Développé incliné haltères',   sets:'3×8–10',  icon:'💪'},
+      {id:'shoulder',  name:'Shoulder press',               sets:'3×8–12',  icon:'🔺'},
+      {id:'elev_lat',  name:'Élévations latérales câble',   sets:'4×12–20', icon:'↔️'},
+      {id:'dips',      name:'Dips / Barre serrée',          sets:'3×8–10',  icon:'⬇️'},
+      {id:'ext_tric',  name:'Extension triceps câble',      sets:'3×10–15', icon:'📏'},
+    ]
+  },
+  {
+    id:'pull', name:'PULL', sub:'Dos · Biceps', color:'pull', series:17,
+    exercises:[
+      {id:'tractions',  name:'Tractions pronation',       sets:'4×6–10',  icon:'⬆️'},
+      {id:'rowing_bb',  name:'Rowing barre',              sets:'4×6–8',   icon:'🚣'},
+      {id:'tirage',     name:'Tirage poulie neutre',      sets:'3×10–12', icon:'⬇️'},
+      {id:'pullover',   name:'Pull-over câble',           sets:'2×12',    icon:'🔄'},
+      {id:'oiseau',     name:'Oiseau rear delt',          sets:'3×12',    icon:'🦅'},
+      {id:'curl_bb',    name:'Curl barre',                sets:'3×8–10',  icon:'💪'},
+      {id:'curl_incl',  name:'Curl incliné',              sets:'3×10–12', icon:'📐'},
+    ]
+  },
+  {
+    id:'legs1', name:'JAMBES', sub:'Quadri · Ischios · Mollets', color:'legs', series:17,
+    exercises:[
+      {id:'squat',   name:'Squat / Presse',               sets:'4×6–10',  icon:'🦵'},
+      {id:'rdl',     name:'RDL / Soulevé semi-tendues',   sets:'3×8–10',  icon:'🏋️'},
+      {id:'leg_curl',name:'Leg curl',                     sets:'3×10–15', icon:'🔄'},
+      {id:'ext_jamb',name:'Extension de jambes',          sets:'3×12–15', icon:'⬆️'},
+      {id:'mollets', name:'Mollets',                      sets:'4×10–20', icon:'👟'},
+    ]
+  },
+  {
+    id:'upper', name:'UPPER', sub:'Volume complémentaire', color:'upper', series:15,
+    exercises:[
+      {id:'dc_incl_m', name:'Développé incliné machine',  sets:'3×10–12', icon:'💪'},
+      {id:'rowing_m',  name:'Rowing machine',             sets:'3×10–12', icon:'🚣'},
+      {id:'elev_lat2', name:'Élévations latérales',       sets:'4×15–20', icon:'↔️'},
+      {id:'oiseau2',   name:'Oiseau rear delt',           sets:'3×12',    icon:'🦅'},
+      {id:'curl_cable',name:'Curl câble',                 sets:'3×12–15', icon:'💪'},
+      {id:'pushdown',  name:'Pushdown triceps',           sets:'3×12–15', icon:'⬇️'},
+    ]
+  },
+  {
+    id:'legs2', name:'JAMBES +', sub:'Rappels + Abdos', color:'legs', series:14,
+    exercises:[
+      {id:'presse2',   name:'Presse / Hack squat',        sets:'3×10–12', icon:'🦵'},
+      {id:'leg_curl2', name:'Leg curl',                   sets:'3×12–15', icon:'🔄'},
+      {id:'mollets2',  name:'Mollets',                    sets:'4×12–20', icon:'👟'},
+      {id:'abdos',     name:'Abdos',                      sets:'4 séries', icon:'🎯'},
+    ]
+  },
+];
+
+// Ordre semaine PPL : L=Push, M=Pull, Me=Legs, J=Upper, V=Legs2, S=off, D=off
+const WEEK_PLAN = [0,1,2,3,4,null,null]; // index dans PROGRAM, null = repos
+
+// Historique initial importé depuis le tracking existant
+const INITIAL_HISTORY = {
+  'dc':         [{d:'23/03/26',v:90},{d:'07/04/26',v:90},{d:'13/04/26',v:80}],
+  'dc_incline': [{d:'23/03/26',v:40}],
+  'shoulder':   [{d:'23/03/26',v:60},{d:'07/04/26',v:70},{d:'13/04/26',v:70}],
+  'elev_lat':   [{d:'13/04/26',v:12.5}],
+  'dips':       [{d:'23/03/26',v:30},{d:'13/04/26',v:30}],
+  'ext_tric':   [{d:'23/03/26',v:20},{d:'07/04/26',v:20},{d:'13/04/26',v:17.5}],
+  'rowing_bb':  [{d:'24/03/26',v:70},{d:'08/04/26',v:80},{d:'14/04/26',v:80},{d:'28/04/26',v:80}],
+  'tirage':     [{d:'24/03/26',v:55},{d:'14/04/26',v:55},{d:'28/04/26',v:55}],
+  'pullover':   [{d:'14/04/26',v:110},{d:'28/04/26',v:null,n:'machine occupée'}],
+  'curl_bb':    [{d:'24/03/26',v:30}],
+  'dc_incl_m':  [{d:'26/03/26',v:45},{d:'10/04/26',v:40},{d:'16/04/26',v:50}],
+  'rowing_m':   [{d:'26/03/26',v:80},{d:'10/04/26',v:80},{d:'16/04/26',v:90}],
+  'elev_lat2':  [{d:'26/03/26',v:12.5},{d:'10/04/26',v:15},{d:'16/04/26',v:12.5}],
+  'oiseau2':    [{d:'10/04/26',v:10},{d:'16/04/26',v:10}],
+  'curl_cable': [{d:'26/03/26',v:20},{d:'10/04/26',v:25,n:'corde'},{d:'16/04/26',v:10,n:'par bras'}],
+  'pushdown':   [{d:'26/03/26',v:30},{d:'10/04/26',v:20,n:'corde'},{d:'16/04/26',v:17.5}],
+};
+
+const STORAGE_KEY = 'workout-tracker-jean-v1';
+let appData = {};
+
+function load() {
+  try {
+    const r = localStorage.getItem(STORAGE_KEY);
+    if (r) appData = JSON.parse(r);
+    else {
+      appData = { history: JSON.parse(JSON.stringify(INITIAL_HISTORY)), sessions: {} };
+      save();
+    }
+  } catch(e) { appData = { history: JSON.parse(JSON.stringify(INITIAL_HISTORY)), sessions: {} }; }
+}
+function save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); } catch(e) {} }
+
+// ============================================================
+// HELPERS
+// ============================================================
+const DAYS_FR = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+const DAYS_FULL = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const DOW_MAP = [null,0,1,2,3,4,null]; // JS dow: 0=dim,1=lun,...6=sam → PROGRAM index
+
+function todayDow() { return new Date().getDay(); } // 0=dim
+function getProgramForDow(dow) {
+  // lun(1)=push, mar(2)=pull, mer(3)=legs1, jeu(4)=upper, ven(5)=legs2
+  const map = {1:0,2:1,3:2,4:3,5:4};
+  return map[dow] !== undefined ? PROGRAM[map[dow]] : null;
+}
+
+function dateKey(date) {
+  const d = new Date(date);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function fmtDate(date) {
+  const d = new Date(date);
+  return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getFullYear()).slice(2);
+}
+
+function getLastVal(exId) {
+  const hist = appData.history[exId];
+  if (!hist || !hist.length) return null;
+  const withVal = hist.filter(h => h.v !== null && h.v !== undefined);
+  if (!withVal.length) return null;
+  return withVal[withVal.length - 1].v;
+}
+
+function isLogged(exId, dateK) {
+  const hist = appData.history[exId];
+  if (!hist) return false;
+  return hist.some(h => {
+    const parts = h.d.split('/');
+    const hKey = '20'+parts[2]+'-'+parts[1].padStart(2,'0')+'-'+parts[0].padStart(2,'0');
+    return hKey === dateK;
+  });
+}
+
+// ============================================================
+// STATE
+// ============================================================
+let currentView = 'today';
+let viewDate = new Date(); viewDate.setHours(0,0,0,0);
+let modalExId = null;
+let modalProgId = null;
+let perfFilter = 'all';
+
+// ============================================================
+// HEADER
+// ============================================================
+function renderHeader() {
+  const now = new Date();
+  document.getElementById('header-date').innerHTML =
+    DAYS_FULL[now.getDay()] + '<br>' + now.getDate() + ' ' + MONTHS_FR[now.getMonth()];
+}
+
+// ============================================================
+// WEEK STRIP
+// ============================================================
+function renderWeekStrip() {
+  const strip = document.getElementById('week-strip');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const mon = new Date(today);
+  mon.setDate(today.getDate() - ((today.getDay()+6)%7));
+
+  strip.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(mon); d.setDate(mon.getDate()+i);
+    const dow = d.getDay();
+    const prog = getProgramForDow(dow);
+    const isToday = d.getTime() === today.getTime();
+    const isView = d.getTime() === viewDate.getTime();
+
+    const colorCls = prog ? prog.color+'-day' : '';
+    const todayCls = isToday ? 'today' : '';
+    const hasCls = prog ? 'has-session' : '';
+
+    const cell = document.createElement('div');
+    cell.className = 'wday';
+    cell.innerHTML = `<div class="wday-lbl">${DAYS_FR[(dow+6)%7+1] || DAYS_FR[dow]}</div>
+      <div class="wday-dot ${hasCls} ${colorCls} ${todayCls}" style="${isView?'outline:2px solid #fff;outline-offset:2px':''}">${d.getDate()}</div>`;
+    cell.onclick = () => { viewDate = new Date(d); renderSession(); renderWeekStrip(); };
+    strip.appendChild(cell);
+  }
+}
+
+// ============================================================
+// SESSION
+// ============================================================
+function renderSession() {
+  const content = document.getElementById('session-content');
+  const dow = viewDate.getDay();
+  const prog = getProgramForDow(dow);
+  const dk = dateKey(viewDate);
+
+  if (!prog) {
+    content.innerHTML = `<div class="empty">😴<br><br>Jour de repos<br><span style="font-size:12px">Récupération active</span></div>`;
+    return;
+  }
+
+  let html = `<div class="session-header ${prog.color}">
+    <div class="session-type ${prog.color}">${prog.name}</div>
+    <div class="session-sub">${prog.sub}</div>
+    <div class="session-series">${prog.series}</div>
+  </div>
+  <div class="exercises" id="ex-list">`;
+
+  prog.exercises.forEach(ex => {
+    const lastVal = getLastVal(ex.id);
+    const logged = isLogged(ex.id, dk);
+    html += `<div class="ex-card ${logged?'logged':''}" id="excard-${ex.id}" onclick="openModal('${ex.id}','${prog.id}')">
+      <div class="ex-main">
+        <div class="ex-icon ${prog.color}">${ex.icon}</div>
+        <div class="ex-info">
+          <div class="ex-name">${ex.name}</div>
+          <div class="ex-sets">${ex.sets}</div>
+        </div>
+        <div class="ex-last">
+          ${lastVal !== null
+            ? `<div class="ex-last-val ${prog.color}">${lastVal}<span style="font-size:12px">kg</span></div><div class="ex-last-lbl">DERNIER</div>`
+            : `<div class="ex-last-val none">—</div><div class="ex-last-lbl">AUCUN</div>`
+          }
+        </div>
+      </div>
+      ${logged ? '<div class="ex-logged-bar"></div>' : ''}
+    </div>`;
+  });
+
+  html += '</div>';
+  content.innerHTML = html;
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function openModal(exId, progId) {
+  const prog = PROGRAM.find(p => p.id === progId);
+  const ex = prog.exercises.find(e => e.id === exId);
+  modalExId = exId;
+  modalProgId = progId;
+
+  document.getElementById('modal-title').textContent = ex.name.toUpperCase();
+  document.getElementById('modal-sub').textContent = ex.sets;
+  document.getElementById('modal-weight').value = '';
+  document.getElementById('modal-note').value = '';
+
+  // Historique
+  const hist = appData.history[exId] || [];
+  const prevEl = document.getElementById('modal-prev');
+  const prevList = document.getElementById('modal-prev-list');
+  if (hist.length) {
+    prevEl.style.display = 'block';
+    prevList.innerHTML = [...hist].reverse().slice(0, 8).map(h =>
+      `<div class="modal-prev-row">
+        <span class="modal-prev-date">${h.d}</span>
+        <span class="modal-prev-val">${h.v !== null && h.v !== undefined ? h.v+'kg' : '—'}${h.n ? ' <span style="font-size:10px;color:var(--muted);font-weight:400">'+h.n+'</span>' : ''}</span>
+      </div>`
+    ).join('');
+  } else {
+    prevEl.style.display = 'none';
+  }
+
+  // Pré-remplir avec dernier poids
+  const lastVal = getLastVal(exId);
+  if (lastVal !== null) document.getElementById('modal-weight').value = lastVal;
+
+  document.getElementById('modal-bg').classList.add('open');
+  setTimeout(() => document.getElementById('modal-weight').focus(), 300);
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal-bg')) closeModalDirect();
+}
+function closeModalDirect() {
+  document.getElementById('modal-bg').classList.remove('open');
+  modalExId = null;
+}
+
+function saveLog() {
+  if (!modalExId) return;
+  const weight = document.getElementById('modal-weight').value;
+  const note = document.getElementById('modal-note').value.trim();
+  const val = weight !== '' ? parseFloat(weight) : null;
+  const dateStr = fmtDate(viewDate);
+
+  if (!appData.history[modalExId]) appData.history[modalExId] = [];
+
+  // Remplace si même date, sinon ajoute
+  const existing = appData.history[modalExId].find(h => h.d === dateStr);
+  if (existing) {
+    existing.v = val;
+    if (note) existing.n = note; else delete existing.n;
+  } else {
+    const entry = { d: dateStr, v: val };
+    if (note) entry.n = note;
+    appData.history[modalExId].push(entry);
+  }
+
+  save();
+  closeModalDirect();
+  renderSession();
+  if (currentView === 'perf') renderPerf();
+}
+
+// ============================================================
+// PERF PAGE
+// ============================================================
+function renderPerf() {
+  // Filtres
+  const filterEl = document.getElementById('perf-filter');
+  const cats = [
+    {id:'all',label:'Tout',cls:'all'},
+    {id:'push',label:'Push',cls:'push'},
+    {id:'pull',label:'Pull',cls:'pull'},
+    {id:'legs',label:'Jambes',cls:'legs'},
+    {id:'upper',label:'Upper',cls:'upper'},
+  ];
+  filterEl.innerHTML = cats.map(c =>
+    `<button class="filter-btn ${c.cls} ${perfFilter===c.id?'active':''}" onclick="setPerfFilter('${c.id}')">${c.label}</button>`
+  ).join('');
+
+  // Liste des exercices filtrés
+  const list = document.getElementById('perf-list');
+  list.innerHTML = '';
+
+  PROGRAM.forEach(prog => {
+    if (perfFilter !== 'all' && prog.color !== perfFilter && !(perfFilter==='legs' && prog.id==='legs2')) {
+      if (perfFilter === 'legs' && prog.color !== 'legs') return;
+      if (perfFilter !== 'legs' && prog.color !== perfFilter) return;
+    }
+
+    prog.exercises.forEach(ex => {
+      const rawHist = (appData.history[ex.id] || []).filter(h => h.v !== null && h.v !== undefined);
+      if (!rawHist.length) return;
+
+      // Trier chronologiquement (ancien → récent) pour le graphique
+      const hist = [...rawHist].sort((a, b) => {
+        const parse = s => { const p=s.split('/'); return new Date('20'+p[2],p[1]-1,p[0]); };
+        return parse(a.d) - parse(b.d);
+      });
+
+      const maxVal = Math.max(...hist.map(h => h.v));
+      const card = document.createElement('div');
+      card.className = 'perf-card';
+
+      // Chart
+      const canvasId = 'chart-'+ex.id;
+      card.innerHTML = `
+        <div class="perf-card-header">
+          <div class="perf-card-name">${ex.name}</div>
+          <div class="perf-card-max ${prog.color}">${maxVal}<span style="font-size:12px;font-weight:400">kg</span></div>
+        </div>
+        <div class="chart-wrap"><canvas id="${canvasId}" width="400" height="70"></canvas></div>
+        <div class="perf-table">
+          ${[...hist].reverse().map(h =>
+            `<div class="perf-table-row">
+              <span class="date">${h.d}</span>
+              <span class="val">${h.v}kg</span>
+              ${h.n ? `<span class="note">${h.n}</span>` : ''}
+            </div>`
+          ).join('')}
+        </div>`;
+      list.appendChild(card);
+
+      // Draw chart after DOM insertion
+      requestAnimationFrame(() => drawChart(canvasId, hist, prog.color));
+    });
+  });
+
+  if (!list.children.length) {
+    list.innerHTML = '<div class="empty">Aucune donnée enregistrée</div>';
+  }
+}
+
+function setPerfFilter(f) {
+  perfFilter = f;
+  renderPerf();
+}
+
+const COLOR_MAP = { push:'#ff6b35', pull:'#4a9eff', legs:'#4ade80', upper:'#f59e0b' };
+
+function drawChart(canvasId, hist, colorKey) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.offsetWidth;
+  const h = 70;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  ctx.scale(dpr, dpr);
+
+  const vals = hist.map(h => h.v);
+  const min = Math.min(...vals) * 0.9;
+  const max = Math.max(...vals) * 1.1;
+  const color = COLOR_MAP[colorKey] || '#fff';
+  const pad = { l:8, r:8, t:8, b:8 };
+  const cw = w - pad.l - pad.r;
+  const ch = h - pad.t - pad.b;
+
+  const pts = vals.map((v, i) => ({
+    x: pad.l + (i / Math.max(vals.length-1,1)) * cw,
+    y: pad.t + (1 - (v - min) / (max - min || 1)) * ch
+  }));
+
+  // Area
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, h - pad.b);
+  pts.forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.lineTo(pts[pts.length-1].x, h - pad.b);
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, color+'40');
+  grad.addColorStop(1, color+'00');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  // Dots
+  pts.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+    ctx.fillStyle = color;
+    ctx.fill();
+  });
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showPage(page) {
+  currentView = page;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.getElementById('bnav-'+page).classList.add('active');
+  if (page === 'perf') renderPerf();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  load();
+  renderHeader();
+  renderWeekStrip();
+  renderSession();
+}
+
+init();
+</script>
+</body>
+</html>
